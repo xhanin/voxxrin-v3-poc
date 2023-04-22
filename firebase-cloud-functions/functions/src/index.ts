@@ -1,11 +1,9 @@
 import * as functions from "firebase-functions";
 
-// // Start writing functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-
 import {initializeApp} from "firebase-admin/app";
 import {getFirestore, FieldValue} from "firebase-admin/firestore";
+
+const axios = require('axios');
 
 initializeApp();
 
@@ -52,3 +50,38 @@ exports.onUserMessageInfoCreate = functions.firestore
             return false;
         }
     });
+
+
+exports.crawl = functions.https.onRequest((request, response) => {
+    functions.logger.info("Starting crawling", {structuredData: true});
+
+    crawlDevoxx().then(
+        () => {
+            functions.logger.info("Crawling done", {structuredData: true});
+            response.send("Crawling done!");
+        }
+    )
+});
+
+const crawlDevoxx = async () => {
+    for (const day of ["monday", "tuesday", "wednesday", "thursday", "friday"]) {
+        await crawlDevoxxDay("dvbe22", day)
+    }
+}
+
+const crawlDevoxxDay = async (eventId: string, day: string) => {
+    const res = await axios.get(`https://${eventId}.cfp.dev/api/public/schedules/${day}`)
+
+    const schedules = res.data;
+
+    for (const schedule of schedules) {
+        let title = schedule.proposal?.title || schedule.sessionType.name
+        functions.logger.info(`${schedule.id} - ${schedule.room.name} - ${title}`, {structuredData: true});
+        functions.logger.info(`/events/${eventId}/days/${day}/schedules/${schedule.id}`, {structuredData: true});
+
+        await db.collection("events").doc(eventId)
+            .collection("days").doc(day)
+            .collection("schedules").doc(schedule.id.toString())
+            .set(schedule)
+    }
+}
