@@ -98,14 +98,9 @@ const Home: React.FC = () => {
     const fetchMessages = async () => {
         const q = query(collection(db, "messages"), where("fromName", "!=", "Nobody"));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const fMessages: Message[] = []
             updateMessages(querySnapshot.docs.map((d) => {
                 return msgConverter.fromFirestore(d, {})
             }))
-            querySnapshot.forEach((qdoc) => {
-                let m = msgConverter.fromFirestore(qdoc, {})
-            });
-            setMessages(fMessages);
         });
     };
 
@@ -126,10 +121,11 @@ const Home: React.FC = () => {
             if (m.id == msgId) {
                 m.favorite = !m.favorite
                 const deviceId = await Device.getId()
-                await setDoc(doc(db, `users/${deviceId.uuid}/messages/${m.id}`), {
+                setDoc(doc(db, `users/${deviceId.uuid}/messages/${m.id}`), {
                     favorite: m.favorite
+                }).then(() => {
+                    console.log(`toggled favorite on firestore for ${msgId} - ${m.favorite}`)
                 })
-                console.log(`toggled favorite for ${msgId} - ${m.favorite}`)
             }
             fMessages.push(m)
         }
