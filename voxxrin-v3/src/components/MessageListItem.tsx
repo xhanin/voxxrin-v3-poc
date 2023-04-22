@@ -1,18 +1,20 @@
 import {
+  IonButton,
   IonItem,
   IonLabel,
   IonNote
-  } from '@ionic/react';
+} from '@ionic/react';
 import { Message } from '../data/messages';
 import './MessageListItem.css';
 
 interface MessageListItemProps {
   message: Message;
+  onToggleFavorite: any;
 }
 
-const MessageListItem: React.FC<MessageListItemProps> = ({ message }) => {
+const MessageListItem: React.FC<MessageListItemProps> = ({ message, onToggleFavorite }) => {
   return (
-    <IonItem routerLink={`/message/${message.id}`} detail={false}>
+    <IonItem detail={false}>
       <div slot="start" className="dot dot-unread"></div>
       <IonLabel className="ion-text-wrap">
         <h2>
@@ -23,9 +25,12 @@ const MessageListItem: React.FC<MessageListItemProps> = ({ message }) => {
         </h2>
         <h3>{message.subject}</h3>
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          Favorites count: {message.favoritesCount}
         </p>
       </IonLabel>
+      <IonButton slot="end" onClick={onToggleFavorite}>
+        {message.favorite ? "O" : "-"}
+      </IonButton>
     </IonItem>
   );
 };

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Message, getMessage } from '../data/messages';
+import { Message } from '../data/messages';
 import {
   IonBackButton,
   IonButtons,
@@ -22,8 +22,8 @@ function ViewMessage() {
   const params = useParams<{ id: string }>();
 
   useIonViewWillEnter(() => {
-    const msg = getMessage(parseInt(params.id, 10));
-    setMessage(msg);
+    // const msg = {};
+    // setMessage(msg);
   });
 
   return (

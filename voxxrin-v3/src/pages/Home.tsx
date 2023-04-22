@@ -17,16 +17,28 @@ import {initializeApp} from "firebase/app";
 import {
     CACHE_SIZE_UNLIMITED,
     collection,
-    getDocs,
+    doc,
+    getDoc,
     getFirestore,
     initializeFirestore,
     onSnapshot,
     persistentLocalCache,
     persistentMultipleTabManager,
     query,
+    setDoc,
     where
 } from "firebase/firestore";
 
+import {Device} from '@capacitor/device';
+
+const logDeviceInfo = async () => {
+    const info = await Device.getInfo();
+
+    console.log(info);
+
+    const id = await Device.getId();
+    console.log(id)
+};
 
 const firebaseConfig = {
     apiKey: "---",
@@ -51,20 +63,15 @@ initializeFirestore(app,
 const db = getFirestore(app);
 
 const msgConverter = {
-    toFirestore: (msg: Message) => {
-        return {
-            fromName: msg.fromName,
-            subject: msg.subject,
-            date: msg.date
-        };
-    },
     fromFirestore: (snapshot, options) => {
         const data = snapshot.data(options);
         return {
             fromName: data.fromName,
             subject: data.subject,
             date: data.date,
-            id: snapshot.id as Number
+            id: snapshot.id as Number,
+            favoritesCount: (data.favoritesCount ?? 0) as Number,
+            favorite: false
         } as Message;
     }
 };
@@ -74,20 +81,36 @@ const Home: React.FC = () => {
 
     const [messages, setMessages] = useState<Message[]>([]);
 
+    const updateMessages = async (messages: Message[]) => {
+        const deviceId = await Device.getId()
+        const fMessages: Message[] = []
+
+        for (const m of messages) {
+            const docRef = doc(db, `users/${deviceId.uuid}/messages/${m.id}`);
+            const docSnap = await getDoc(docRef);
+            m.favorite = docSnap?.data()?.favorite ?? false
+            fMessages.push(m)
+            console.log(`refreshed firestore: ${m.id} => ${m.fromName} ${m.subject} ${m.date}`);
+        }
+
+        setMessages(fMessages);
+    }
     const fetchMessages = async () => {
         const q = query(collection(db, "messages"), where("fromName", "!=", "Nobody"));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const fMessages: Message[] = []
-            querySnapshot.forEach((doc) => {
-                let m = msgConverter.fromFirestore(doc, {})
-                fMessages.push(m)
-                console.log(`refreshed firestore: ${doc.id} => ${m.fromName} ${m.subject} ${m.date}`);
+            updateMessages(querySnapshot.docs.map((d) => {
+                return msgConverter.fromFirestore(d, {})
+            }))
+            querySnapshot.forEach((qdoc) => {
+                let m = msgConverter.fromFirestore(qdoc, {})
             });
             setMessages(fMessages);
         });
     };
 
     useEffect(() => {
+        logDeviceInfo()
         fetchMessages()
     }, []);
 
@@ -96,6 +119,22 @@ const Home: React.FC = () => {
             e.detail.complete();
         }, 3000);
     };
+
+    async function toggleFavorite(msgId: number) {
+        const fMessages: Message[] = []
+        for (const m of messages) {
+            if (m.id == msgId) {
+                m.favorite = !m.favorite
+                const deviceId = await Device.getId()
+                await setDoc(doc(db, `users/${deviceId.uuid}/messages/${m.id}`), {
+                    favorite: m.favorite
+                })
+                console.log(`toggled favorite for ${msgId} - ${m.favorite}`)
+            }
+            fMessages.push(m)
+        }
+        setMessages(fMessages);
+    }
 
     return (
         <IonPage id="home-page">
@@ -118,7 +157,8 @@ const Home: React.FC = () => {
                 </IonHeader>
 
                 <IonList>
-                    {messages.map(m => <MessageListItem key={m.id} message={m}/>)}
+                    {messages.map(m => <MessageListItem key={m.id} message={m}
+                                                        onToggleFavorite={() => toggleFavorite(m.id)}/>)}
                 </IonList>
             </IonContent>
         </IonPage>
