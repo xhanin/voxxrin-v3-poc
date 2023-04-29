@@ -50,3 +50,16 @@ export interface Event {
     id: string,
     daySchedules: DaySchedule[]
 }
+
+export interface EventInfo {
+    id: string,
+    title: string,
+    start: string, // local date
+    end: string,
+    days: string[],
+    logo: string,
+    backgroundImage: string,
+    location: { city: string, country: string },
+    keywords: string[],
+    mainColor: string
+}

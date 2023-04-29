@@ -3,14 +3,16 @@ import * as _ from "lodash";
 
 import {DevoxxScheduleItem, DevoxxScheduleProposal, DevoxxScheduleSpeakerInfo, DevoxxScheduleItemTag} from "./types"
 import {DaySchedule, Event, ScheduleSpeakerInfo} from "../../schedule"
+import { TalkStats } from "../../feedbacks";
 
 const axios = require('axios');
 
 export const crawl = async (eventId:string) => {
     const days = ["monday", "tuesday", "wednesday", "thursday", "friday"]
-    const event: Event = { id: eventId, daySchedules: []}
+    const event: Event = { id: eventId, daySchedules: [], talkStats: []}
     for (const day of days) {
-        event.daySchedules.push(await crawlDevoxxDay(eventId, day))
+        const {daySchedule, talkStats} = await crawlDevoxxDay(eventId, day)
+        event.daySchedules.push(daySchedule)
     }
     return event
 }
@@ -24,6 +26,8 @@ const crawlDevoxxDay = async (eventId: string, day: string) => {
         day: day,
         timeSlots: []
     }
+
+    const talkStats: TalkStats[] = []
 
     const slots = _.groupBy(schedules, (s:DevoxxScheduleItem) => {return s.fromDate + "--" + s.toDate})
 
@@ -90,7 +94,7 @@ const crawlDevoxxDay = async (eventId: string, day: string) => {
         }
     })
 
-    return daySchedule
+    return {daySchedule, talkStats}
 
 
     // for (const schedule of schedules) {

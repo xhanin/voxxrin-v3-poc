@@ -57,6 +57,22 @@ exports.onUserMessageInfoCreate = functions.firestore
 exports.crawl = functions.https.onRequest((request, response) => {
     info("Starting crawling");
 
+    db.collection("events").doc("dvbe22").set({
+        id: "dvbe22",
+        title: "Devoxx BE 2022",
+        start: "2022-10-10",
+        end: "2022-10-14",
+        days: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+        // Should fit in a xxx x xxx pixels square
+        logo: "https://acme.com/my-conf-logo.png",
+        // Should fit in a xxx x xxx pixels rectangle
+        backgroundImage: "https://acme.com/background.png",
+        location: { city: "Anvers", country: "BE" },
+        keywords: [ "Devoxx", "Java", "Kotlin", "Cloud", "Big data", "Web" ],
+        mainColor: "#F78125"
+      }
+    )
+
     crawlDevoxx("dvbe22").then(
         (event: Event) => {
             saveEvent(event).then(() => {

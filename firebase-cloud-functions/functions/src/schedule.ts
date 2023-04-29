@@ -1,3 +1,5 @@
+import {TalkStats} from "./feedbacks"
+
 export interface ScheduleTimeSlot {
     id: string;
     start: string;
@@ -48,5 +50,19 @@ export interface DaySchedule {
 
 export interface Event {
     id: string,
-    daySchedules: DaySchedule[]
+    daySchedules: DaySchedule[],
+    talkStats: TalkStats[]
+}
+
+export interface EventInfo {
+    id: string,
+    title: string,
+    start: string, // local date
+    end: string,
+    days: string[],
+    logo: string,
+    backgroundImage: string,
+    location: { city: string, country: string },
+    keywords: string[],
+    mainColor: string
 }
