@@ -40,6 +40,7 @@ const crawlDevoxxDay = async (eventId: string, day: string) => {
                 id: key,
                 start: start,
                 end: end,
+                type: "break",
                 break: {
                     title: items[0].sessionType.name,
                     room: {
@@ -55,6 +56,7 @@ const crawlDevoxxDay = async (eventId: string, day: string) => {
                 id: key,
                 start: start,
                 end: end,
+                type: "talks",
                 talks: items.map((item: DevoxxScheduleItem) => {
                     const proposal = item.proposal!!
                     return {

@@ -10,6 +10,7 @@ export interface RoomInfo {
 }
 
 export interface BreakScheduleTimeSlot extends ScheduleTimeSlot {
+    type: "break";
     break: {
         title: string,
         room: RoomInfo,
@@ -35,6 +36,7 @@ export interface ScheduleTalk {
 }
 
 export interface TalksScheduleTimeSlot extends ScheduleTimeSlot {
+    type: "talks";
     talks: ScheduleTalk[];
 }
 
