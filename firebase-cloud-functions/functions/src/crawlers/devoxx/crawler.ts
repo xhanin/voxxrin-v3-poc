@@ -13,6 +13,9 @@ export const crawl = async (eventId:string) => {
     for (const day of days) {
         const {daySchedule, talkStats} = await crawlDevoxxDay(eventId, day)
         event.daySchedules.push(daySchedule)
+        for (const talkStat of talkStats) {
+            event.talkStats.push(talkStat)
+        }
     }
     return event
 }
@@ -90,7 +93,12 @@ const crawlDevoxxDay = async (eventId: string, day: string) => {
                         language: "EN"
                     }
                 })
-            })        
+            })
+            items.forEach((i) => {
+                if (i.totalFavourites !== undefined && i.proposal?.id !== undefined) {
+                    talkStats.push({id: i.proposal?.id.toString(), totalFavoritesCount: i.totalFavourites})
+                }
+            })
         }
     })
 

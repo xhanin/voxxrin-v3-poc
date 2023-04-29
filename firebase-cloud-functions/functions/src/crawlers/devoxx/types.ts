@@ -19,6 +19,7 @@ export interface DevoxxScheduleItem {
         },
         proposal?: DevoxxScheduleProposal,
         timezone: string,
+        totalFavourites?: number
 }
 
 export interface DevoxxScheduleSpeakerInfo {

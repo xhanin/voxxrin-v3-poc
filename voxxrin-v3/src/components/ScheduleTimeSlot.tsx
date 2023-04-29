@@ -6,29 +6,22 @@ import {
 } from '@ionic/react';
 
 import {BreakScheduleTimeSlot, TalksScheduleTimeSlot} from "../data/schedule"
-import { time } from 'ionicons/icons';
+
+import ScheduleTalkItem from "./ScheduleTalkItem"
 
 
 interface ScheduleTimeSlotProps {
+    eventId: string,
     timeSlot: BreakScheduleTimeSlot | TalksScheduleTimeSlot;
-  }
+}
   
 
-const ScheduleTimeSlot: React.FC<ScheduleTimeSlotProps> = ({timeSlot}) => {
+const ScheduleTimeSlot: React.FC<ScheduleTimeSlotProps> = ({eventId, timeSlot}) => {
     var content;
 if (timeSlot.type == "talks") {
     const slot = timeSlot as TalksScheduleTimeSlot
     content = slot.talks.map((talk) => {
-        return <IonCard key={talk.id}>
-        <IonCardHeader>
-          <IonCardTitle>{talk.title}</IonCardTitle>
-          <IonCardSubtitle>{talk.track.title}</IonCardSubtitle>
-        </IonCardHeader>
-    
-        <IonCardContent>
-          {talk.room.title}
-        </IonCardContent>
-      </IonCard>
+        return <ScheduleTalkItem key={talk.id} eventId={eventId} talk={talk} />
     })
 } else {
     const slot = timeSlot as BreakScheduleTimeSlot

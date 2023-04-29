@@ -89,4 +89,11 @@ const saveEvent = async function(event: Event) {
         .collection("days").doc(daySchedule.day)
             .set(daySchedule)
     }
+    for (const talkStat of event.talkStats) {
+        // TODO: see if we really want to override stats each time we crawl
+        info("saving stats " + talkStat);
+        await db.collection("events").doc(event.id)
+            .collection("talkStats").doc(talkStat.id)
+            .set(talkStat)
+    }
 }

@@ -11,7 +11,7 @@ import useDaySchedule from "../hooks/useDaySchedule"
 
 interface EventDayScheduleProps {
     eventId: string;
-    day: string;
+    day?: string;
 }
 
 
@@ -21,10 +21,10 @@ const EventDaySchedule: React.FC<EventDayScheduleProps> = ({eventId, day}) => {
     return (
         <>
         <IonHeader>
-            {daySchedule?.day ?? "Loading"}
+            {daySchedule?.day ?? "Loading..."}
         </IonHeader>
         <IonAccordionGroup>
-            {daySchedule?.timeSlots?.map((s) => <ScheduleTimeSlot timeSlot={s} key={s.id} />)}
+            {daySchedule?.timeSlots?.map((s) => <ScheduleTimeSlot eventId={eventId} timeSlot={s} key={s.id} />)}
         </IonAccordionGroup>
     </>
     );
