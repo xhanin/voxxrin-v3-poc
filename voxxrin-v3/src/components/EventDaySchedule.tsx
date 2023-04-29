@@ -9,8 +9,14 @@ import './EventDaySchedule.css';
 
 import useDaySchedule from "../hooks/useDaySchedule"
 
-const EventDaySchedule: React.FC = () => {
-    const daySchedule = useDaySchedule()
+interface EventDayScheduleProps {
+    eventId: string;
+    day: string;
+}
+
+
+const EventDaySchedule: React.FC<EventDayScheduleProps> = ({eventId, day}) => {
+    const daySchedule = useDaySchedule({eventId, day})
 
     return (
         <>

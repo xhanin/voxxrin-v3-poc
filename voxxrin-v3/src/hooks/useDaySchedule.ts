@@ -1,38 +1,26 @@
 import { useState, useEffect } from 'react';
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase"
+import { DaySchedule } from "../data/schedule"
 
-import {
-    CACHE_SIZE_UNLIMITED,
-    collection,
-    doc,
-    getDoc,
-    getFirestore,
-    initializeFirestore,
-    onSnapshot,
-    persistentLocalCache,
-    persistentMultipleTabManager,
-    query,
-    setDoc,
-    where
-} from "firebase/firestore";
+export interface EventDayScheduleProps {
+  eventId: string;
+  day: string;
+}
 
-import {db} from "../firebase"
-import {DaySchedule} from "../data/schedule"
-
-
-export default function useDaySchedule() {
+export default function useDaySchedule(props: EventDayScheduleProps) {
     const [daySchedule, setDaySchedule] = useState(null as DaySchedule | null);
-    const eventId: string = "dvbe22"
-    const day: string = "wednesday"
+    const eventId: string = props.eventId
+    const day: string = props.day
 
     useEffect(() => {
         const d = doc(db, `events/${eventId}/days/${day}`)
         const unsubscribe = onSnapshot(d, docSnapshot => {
-            console.log(`Received doc snapshot: ${docSnapshot}`);
             setDaySchedule(docSnapshot.data() as DaySchedule)
           }, err => {
             console.log(`Encountered error: ${err}`);
           });
       return unsubscribe;
-    }, []);
+    }, [eventId, day]);
     return daySchedule;
   }
