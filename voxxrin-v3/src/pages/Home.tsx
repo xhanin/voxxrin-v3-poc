@@ -50,17 +50,17 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-initializeFirestore(app,
-    {
-        localCache:
-            persistentLocalCache({
-                tabManager: persistentMultipleTabManager(),
-                cacheSizeBytes: CACHE_SIZE_UNLIMITED
-            }),
-    });
+// const app = initializeApp(firebaseConfig);
+// initializeFirestore(app,
+//     {
+//         localCache:
+//             persistentLocalCache({
+//                 tabManager: persistentMultipleTabManager(),
+//                 cacheSizeBytes: CACHE_SIZE_UNLIMITED
+//             }),
+//     });
 
-const db = getFirestore(app);
+// const db = getFirestore(app);
 
 const msgConverter = {
     fromFirestore: (snapshot, options) => {
